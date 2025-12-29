@@ -8,24 +8,25 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: JetBrains Mono for that coding feel -->
+    <!-- Google Fonts: JetBrains Mono -->
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;400;700;800&display=swap" rel="stylesheet">
     
-    <!-- FontAwesome for Icons -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Chart.js for Admin Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
+        // Dynamic Theme Configuration
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         'cyber-black': '#050505',
                         'cyber-dark': '#0a0a0a',
-                        'cyber-green': '#00ff41',
-                        'cyber-green-dim': 'rgba(0, 255, 65, 0.1)',
-                        'cyber-purple': '#bd00ff',
-                        'cyber-blue': '#00f3ff',
-                        'cyber-red': '#ff003c',
+                        'primary': 'var(--primary)',
+                        'primary-dim': 'var(--primary-dim)',
                     },
                     fontFamily: {
                         mono: ['"JetBrains Mono"', 'monospace'],
@@ -34,6 +35,7 @@
                         'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'glitch': 'glitch 1s linear infinite',
                         'scanline': 'scanline 8s linear infinite',
+                        'spin-slow': 'spin 3s linear infinite',
                     },
                     keyframes: {
                         glitch: {
@@ -52,16 +54,23 @@
     </script>
 
     <style>
+        :root {
+            --primary: #00ff41;
+            --primary-dim: rgba(0, 255, 65, 0.1);
+            --primary-glow: rgba(0, 255, 65, 0.5);
+        }
+
         /* --- CORE VISUALS --- */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #00ff41; border-radius: 0; }
-        ::-webkit-scrollbar-thumb:hover { background: #008f24; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 0; }
+        ::-webkit-scrollbar-thumb:hover { background: #fff; }
 
         body {
             background-color: #050505;
             color: #e0e0e0;
             overflow-x: hidden;
+            transition: color 0.5s ease;
         }
 
         /* Matrix Canvas */
@@ -70,14 +79,14 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: -1;
-            opacity: 0.12;
+            opacity: 0.15;
             pointer-events: none;
         }
 
         /* CRT Scanline Effect */
         .scanline-overlay {
             position: fixed;
-            top: 0; left: 0; w-full; h-full;
+            top: 0; left: 0; 
             width: 100vw; height: 100vh;
             background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
             background-size: 100% 4px;
@@ -86,28 +95,17 @@
             opacity: 0.6;
         }
         
-        .flicker {
-            animation: flicker 0.15s infinite;
-        }
+        .flicker { animation: flicker 0.15s infinite; }
         @keyframes flicker {
-            0% { opacity: 0.97; }
-            5% { opacity: 0.95; }
-            10% { opacity: 0.9; }
-            15% { opacity: 0.95; }
-            20% { opacity: 0.99; }
-            50% { opacity: 0.95; }
-            80% { opacity: 0.9; }
-            100% { opacity: 0.97; }
+            0% { opacity: 0.97; } 5% { opacity: 0.95; } 10% { opacity: 0.9; } 15% { opacity: 0.95; } 20% { opacity: 0.99; } 50% { opacity: 0.95; } 80% { opacity: 0.9; } 100% { opacity: 0.97; }
         }
 
         /* --- UTILITIES --- */
-        .text-glow { text-shadow: 0 0 5px #00ff41, 0 0 10px #00ff41; }
-        .text-glow-blue { text-shadow: 0 0 5px #00f3ff, 0 0 10px #00f3ff; }
-        .text-glow-purple { text-shadow: 0 0 5px #bd00ff, 0 0 10px #bd00ff; }
-        .text-glow-red { text-shadow: 0 0 5px #ff003c, 0 0 10px #ff003c; }
-
-        .box-glow { box-shadow: 0 0 10px rgba(0, 255, 65, 0.2), inset 0 0 20px rgba(0, 255, 65, 0.05); }
-        .box-glow:hover { box-shadow: 0 0 20px rgba(0, 255, 65, 0.4), inset 0 0 30px rgba(0, 255, 65, 0.1); }
+        .text-glow { text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary); }
+        .border-glow { box-shadow: 0 0 5px var(--primary), inset 0 0 5px var(--primary-dim); }
+        
+        .box-glow { box-shadow: 0 0 10px var(--primary-dim), inset 0 0 20px var(--primary-dim); }
+        .box-glow:hover { box-shadow: 0 0 20px var(--primary-glow), inset 0 0 30px var(--primary-dim); }
 
         .glass-panel {
             background: rgba(10, 10, 10, 0.7);
@@ -117,23 +115,16 @@
         }
 
         /* 3D Tilt specific styles */
-        .tilt-card {
-            transform-style: preserve-3d;
-            transform: perspective(1000px);
-        }
-        .tilt-content {
-            transform: translateZ(20px);
-        }
+        .tilt-card { transform-style: preserve-3d; transform: perspective(1000px); }
+        .tilt-content { transform: translateZ(20px); }
 
         /* --- SPA TRANSITIONS --- */
         .page-section {
-            display: none;
-            opacity: 0;
+            display: none; opacity: 0;
             transition: opacity 0.4s ease-in-out;
         }
         .page-section.active {
-            display: block;
-            opacity: 1;
+            display: block; opacity: 1;
             animation: pageIn 0.5s ease-out forwards;
         }
         @keyframes pageIn {
@@ -146,13 +137,18 @@
             content: '█';
             animation: blink 1s step-end infinite;
             margin-left: 2px;
-            color: #00ff41;
+            color: var(--primary);
         }
         @keyframes blink { 50% { opacity: 0; } }
 
+        /* Hexagon Grid Background for Admin */
+        .hex-bg {
+            background-color: #000;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23111' fill-opacity='0.4' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-7.5L27.99 34H28v2.31h-.01L17 42.65V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
     </style>
 </head>
-<body class="font-mono bg-cyber-black min-h-screen flex flex-col flicker">
+<body class="font-mono bg-cyber-black min-h-screen flex flex-col flicker transition-colors duration-500">
 
     <!-- OVERLAYS -->
     <div class="scanline-overlay"></div>
@@ -160,11 +156,29 @@
 
     <!-- LOADING SCREEN -->
     <div id="loader" class="fixed inset-0 bg-black z-[100] flex flex-col justify-center items-center font-bold">
-        <div class="w-64 mb-4 font-mono text-sm text-cyber-green">
+        <div class="w-64 mb-4 font-mono text-sm text-primary">
             <div id="loader-text">> MOUNTING SYSTEM DRIVES...</div>
         </div>
         <div class="w-64 h-1 bg-gray-900 overflow-hidden relative">
-            <div id="progress-bar" class="absolute h-full bg-cyber-green w-0 transition-all duration-[1500ms] ease-out"></div>
+            <div id="progress-bar" class="absolute h-full bg-primary w-0 transition-all duration-[1500ms] ease-out"></div>
+        </div>
+    </div>
+
+    <!-- AUDIO TOGGLE (Fixed Bottom Right) -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 items-end">
+        <div id="theme-selector" class="hidden bg-black/90 border border-primary p-2 rounded mb-2 flex flex-col gap-2">
+            <button onclick="themes.set('green')" class="text-xs text-green-400 hover:bg-green-900/50 p-1 w-full text-right">MATRIX_GREEN</button>
+            <button onclick="themes.set('blue')" class="text-xs text-blue-400 hover:bg-blue-900/50 p-1 w-full text-right">ICE_BLUE</button>
+            <button onclick="themes.set('red')" class="text-xs text-red-500 hover:bg-red-900/50 p-1 w-full text-right">ALERT_RED</button>
+            <button onclick="themes.set('purple')" class="text-xs text-purple-400 hover:bg-purple-900/50 p-1 w-full text-right">SYNTH_WAVE</button>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="document.getElementById('theme-selector').classList.toggle('hidden'); sfx.play('click')" class="w-10 h-10 border border-primary text-primary hover:bg-primary hover:text-black transition-all flex items-center justify-center rounded-full glass-panel">
+                <i class="fa-solid fa-palette"></i>
+            </button>
+            <button id="mute-btn" onclick="sfx.toggle()" class="w-10 h-10 border border-primary text-primary hover:bg-primary hover:text-black transition-all flex items-center justify-center rounded-full glass-panel">
+                <i class="fa-solid fa-volume-xmark" id="mute-icon"></i>
+            </button>
         </div>
     </div>
 
@@ -172,26 +186,26 @@
     <nav class="fixed top-0 w-full z-50 border-b border-white/10 bg-black/90 backdrop-blur-md h-16">
         <div class="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
             <!-- Logo -->
-            <button onclick="router.navigate('home')" class="flex items-center gap-3 group focus:outline-none">
-                <div class="w-8 h-8 bg-cyber-green/10 border border-cyber-green flex items-center justify-center group-hover:bg-cyber-green/30 transition-colors">
-                    <i class="fa-solid fa-code text-cyber-green text-sm"></i>
+            <button onclick="router.navigate('home')" onmouseenter="sfx.play('hover')" class="flex items-center gap-3 group focus:outline-none">
+                <div class="w-8 h-8 bg-primary-dim border border-primary flex items-center justify-center group-hover:bg-primary group-hover:text-black transition-all duration-300">
+                    <i class="fa-solid fa-code text-primary group-hover:text-black text-sm"></i>
                 </div>
-                <span class="font-bold text-xl tracking-tighter text-white">0x<span class="text-cyber-green group-hover:text-white transition-colors">CLUB</span></span>
+                <span class="font-bold text-xl tracking-tighter text-white">0x<span class="text-primary group-hover:text-white transition-colors">CLUB</span></span>
             </button>
 
             <!-- Desktop Nav -->
             <div class="hidden md:flex items-center gap-1">
-                <button onclick="router.navigate('home')" class="nav-btn px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-all rounded" data-target="home">~/HOME</button>
-                <button onclick="router.navigate('tracks')" class="nav-btn px-4 py-2 text-sm text-gray-400 hover:text-cyber-blue hover:bg-cyber-blue/5 transition-all rounded" data-target="tracks">~/TRACKS</button>
-                <button onclick="router.navigate('projects')" class="nav-btn px-4 py-2 text-sm text-gray-400 hover:text-cyber-purple hover:bg-cyber-purple/5 transition-all rounded" data-target="projects">~/PROJECTS</button>
-                <button onclick="router.navigate('events')" class="nav-btn px-4 py-2 text-sm text-gray-400 hover:text-cyber-red hover:bg-cyber-red/5 transition-all rounded" data-target="events">~/EVENTS</button>
-                <button onclick="router.navigate('terminal')" class="ml-4 px-4 py-2 bg-cyber-green/10 border border-cyber-green/50 text-cyber-green text-sm font-bold hover:bg-cyber-green hover:text-black transition-all flex items-center gap-2">
+                <button onclick="router.navigate('home')" onmouseenter="sfx.play('hover')" class="nav-btn px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-all rounded" data-target="home">~/HOME</button>
+                <button onclick="router.navigate('tracks')" onmouseenter="sfx.play('hover')" class="nav-btn px-4 py-2 text-sm text-gray-400 hover:text-primary hover:bg-primary-dim transition-all rounded" data-target="tracks">~/TRACKS</button>
+                <button onclick="router.navigate('projects')" onmouseenter="sfx.play('hover')" class="nav-btn px-4 py-2 text-sm text-gray-400 hover:text-primary hover:bg-primary-dim transition-all rounded" data-target="projects">~/PROJECTS</button>
+                <button onclick="router.navigate('events')" onmouseenter="sfx.play('hover')" class="nav-btn px-4 py-2 text-sm text-gray-400 hover:text-primary hover:bg-primary-dim transition-all rounded" data-target="events">~/EVENTS</button>
+                <button onclick="router.navigate('terminal')" onmouseenter="sfx.play('hover')" class="ml-4 px-4 py-2 bg-primary-dim border border-primary text-primary text-sm font-bold hover:bg-primary hover:text-black transition-all flex items-center gap-2">
                     <i class="fa-solid fa-terminal"></i> TERM_ACCESS
                 </button>
             </div>
 
             <!-- Mobile Toggle -->
-            <button onclick="toggleMobileMenu()" class="md:hidden text-cyber-green text-xl focus:outline-none">
+            <button onclick="toggleMobileMenu()" class="md:hidden text-primary text-xl focus:outline-none">
                 <i class="fa-solid fa-bars"></i>
             </button>
         </div>
@@ -199,11 +213,11 @@
 
     <!-- Mobile Menu Overlay -->
     <div id="mobile-menu" class="fixed inset-0 bg-black/95 z-40 hidden flex-col pt-24 px-8 gap-4 transform transition-transform">
-        <button onclick="router.navigate('home'); toggleMobileMenu()" class="text-2xl font-bold text-left hover:text-cyber-green border-b border-gray-800 pb-2">01. HOME</button>
-        <button onclick="router.navigate('tracks'); toggleMobileMenu()" class="text-2xl font-bold text-left hover:text-cyber-blue border-b border-gray-800 pb-2">02. TRACKS</button>
-        <button onclick="router.navigate('projects'); toggleMobileMenu()" class="text-2xl font-bold text-left hover:text-cyber-purple border-b border-gray-800 pb-2">03. PROJECTS</button>
-        <button onclick="router.navigate('events'); toggleMobileMenu()" class="text-2xl font-bold text-left hover:text-cyber-red border-b border-gray-800 pb-2">04. EVENTS</button>
-        <button onclick="router.navigate('terminal'); toggleMobileMenu()" class="text-2xl font-bold text-left text-cyber-green mt-8">> LAUNCH TERMINAL</button>
+        <button onclick="router.navigate('home'); toggleMobileMenu()" class="text-2xl font-bold text-left hover:text-primary border-b border-gray-800 pb-2">01. HOME</button>
+        <button onclick="router.navigate('tracks'); toggleMobileMenu()" class="text-2xl font-bold text-left hover:text-primary border-b border-gray-800 pb-2">02. TRACKS</button>
+        <button onclick="router.navigate('projects'); toggleMobileMenu()" class="text-2xl font-bold text-left hover:text-primary border-b border-gray-800 pb-2">03. PROJECTS</button>
+        <button onclick="router.navigate('events'); toggleMobileMenu()" class="text-2xl font-bold text-left hover:text-primary border-b border-gray-800 pb-2">04. EVENTS</button>
+        <button onclick="router.navigate('terminal'); toggleMobileMenu()" class="text-2xl font-bold text-left text-primary mt-8">> LAUNCH TERMINAL</button>
         <button onclick="toggleMobileMenu()" class="absolute top-4 right-4 text-gray-500 text-xl"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
@@ -215,27 +229,27 @@
             <!-- Hero -->
             <div class="flex-grow flex items-center justify-center px-4 relative">
                 <div class="text-center max-w-5xl mx-auto z-10">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyber-green/30 bg-cyber-green/5 text-cyber-green text-xs font-bold tracking-[0.2em] mb-8 animate-pulse">
-                        <span class="w-2 h-2 rounded-full bg-cyber-green"></span> SYSTEM ONLINE
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary bg-primary-dim text-primary text-xs font-bold tracking-[0.2em] mb-8 animate-pulse">
+                        <span class="w-2 h-2 rounded-full bg-primary"></span> SYSTEM ONLINE
                     </div>
                     
                     <h1 class="text-5xl md:text-8xl font-black mb-6 tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-br from-white via-gray-200 to-gray-600">
                         CODE THE <br>
-                        <span class="text-cyber-green text-glow inline-block hover:skew-x-12 transition-transform duration-300 cursor-none">IMPOSSIBLE</span>
+                        <span class="text-primary text-glow inline-block hover:skew-x-12 transition-transform duration-300 cursor-default" onmouseenter="sfx.play('glitch')">IMPOSSIBLE</span>
                     </h1>
                     
                     <div class="h-12 flex items-center justify-center mb-10">
-                        <p class="text-lg md:text-2xl text-cyber-blue font-light font-mono">
+                        <p class="text-lg md:text-2xl text-primary font-light font-mono">
                             <span class="text-gray-600 mr-2">root@0xClub:~$</span>
                             <span id="typing-hero" class="cursor"></span>
                         </p>
                     </div>
 
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <button onclick="router.navigate('tracks')" class="px-8 py-4 bg-cyber-green text-black font-bold text-sm tracking-widest hover:bg-white hover:scale-105 transition-all duration-300 clip-path-slant">
+                        <button onclick="router.navigate('tracks'); sfx.play('click')" onmouseenter="sfx.play('hover')" class="px-8 py-4 bg-primary text-black font-bold text-sm tracking-widest hover:bg-white hover:scale-105 transition-all duration-300 clip-path-slant box-glow">
                             INITIALIZE_PATH
                         </button>
-                        <button onclick="router.navigate('terminal')" class="px-8 py-4 bg-transparent border border-gray-700 text-white font-bold text-sm tracking-widest hover:border-cyber-green hover:text-cyber-green hover:scale-105 transition-all duration-300">
+                        <button onclick="router.navigate('terminal'); sfx.play('click')" onmouseenter="sfx.play('hover')" class="px-8 py-4 bg-transparent border border-gray-700 text-white font-bold text-sm tracking-widest hover:border-primary hover:text-primary hover:scale-105 transition-all duration-300">
                             > EXECUTE_SHELL
                         </button>
                     </div>
@@ -246,12 +260,12 @@
             <div class="border-t border-white/5 bg-black/40 backdrop-blur-sm py-4">
                 <div class="max-w-7xl mx-auto px-4 flex justify-between text-xs md:text-sm font-mono text-gray-500">
                     <div class="flex gap-8">
-                        <span>CPU: <span class="text-cyber-green">14%</span></span>
-                        <span>RAM: <span class="text-cyber-green">2.4GB</span></span>
-                        <span class="hidden md:inline">NET: <span class="text-cyber-green">CONNECTED</span></span>
+                        <span>CPU: <span class="text-primary" id="mini-cpu">14%</span></span>
+                        <span>RAM: <span class="text-primary">2.4GB</span></span>
+                        <span class="hidden md:inline">NET: <span class="text-primary">SECURE</span></span>
                     </div>
                     <div>
-                        LATENCY: <span class="text-cyber-blue">24ms</span>
+                        LATENCY: <span class="text-primary">24ms</span>
                     </div>
                 </div>
             </div>
@@ -262,29 +276,26 @@
             <div class="max-w-7xl mx-auto">
                 <div class="flex items-end justify-between mb-16 border-b border-white/10 pb-4">
                     <div>
-                        <div class="text-cyber-blue text-xs font-bold tracking-widest mb-2">DIRECTORY: /USR/BIN/TRACKS</div>
+                        <div class="text-primary text-xs font-bold tracking-widest mb-2">DIRECTORY: /USR/BIN/TRACKS</div>
                         <h2 class="text-4xl md:text-5xl font-bold text-white">LEARNING MODULES</h2>
-                    </div>
-                    <div class="hidden md:block text-right text-gray-500 text-xs">
-                        Permissions: drwxr-xr-x<br>Owner: root
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 perspective-1000">
                     <!-- Web Dev Card -->
-                    <div class="tilt-card glass-panel p-1 group cursor-pointer h-96">
-                        <div class="bg-black/40 h-full p-8 flex flex-col relative overflow-hidden border border-transparent group-hover:border-cyber-blue/50 transition-colors">
-                            <div class="absolute -right-10 -top-10 text-9xl text-cyber-blue/5 rotate-12 group-hover:rotate-0 transition-transform duration-700">
+                    <div class="tilt-card glass-panel p-1 group cursor-pointer h-96" onmouseenter="sfx.play('hover')">
+                        <div class="bg-black/40 h-full p-8 flex flex-col relative overflow-hidden border border-transparent group-hover:border-primary transition-colors">
+                            <div class="absolute -right-10 -top-10 text-9xl text-primary opacity-5 rotate-12 group-hover:rotate-0 transition-transform duration-700">
                                 <i class="fa-brands fa-react"></i>
                             </div>
                             <div class="tilt-content z-10">
-                                <i class="fa-solid fa-layer-group text-4xl text-cyber-blue mb-6"></i>
+                                <i class="fa-solid fa-layer-group text-4xl text-primary mb-6"></i>
                                 <h3 class="text-2xl font-bold text-white mb-2">FULL STACK</h3>
-                                <div class="w-12 h-1 bg-cyber-blue mb-6"></div>
+                                <div class="w-12 h-1 bg-primary mb-6"></div>
                                 <p class="text-gray-400 text-sm leading-relaxed mb-6">
                                     Master the MERN stack. Build decentralized apps. Control the DOM.
                                 </p>
-                                <ul class="text-xs text-cyber-blue space-y-2 font-mono">
+                                <ul class="text-xs text-primary space-y-2 font-mono">
                                     <li>> React.js / Next.js</li>
                                     <li>> Node & Express</li>
                                     <li>> PostgreSQL / Mongo</li>
@@ -294,19 +305,19 @@
                     </div>
 
                     <!-- Security Card -->
-                    <div class="tilt-card glass-panel p-1 group cursor-pointer h-96">
-                        <div class="bg-black/40 h-full p-8 flex flex-col relative overflow-hidden border border-transparent group-hover:border-cyber-green/50 transition-colors">
-                            <div class="absolute -right-10 -top-10 text-9xl text-cyber-green/5 rotate-12 group-hover:rotate-0 transition-transform duration-700">
+                    <div class="tilt-card glass-panel p-1 group cursor-pointer h-96" onmouseenter="sfx.play('hover')">
+                        <div class="bg-black/40 h-full p-8 flex flex-col relative overflow-hidden border border-transparent group-hover:border-primary transition-colors">
+                            <div class="absolute -right-10 -top-10 text-9xl text-primary opacity-5 rotate-12 group-hover:rotate-0 transition-transform duration-700">
                                 <i class="fa-solid fa-user-secret"></i>
                             </div>
                             <div class="tilt-content z-10">
-                                <i class="fa-solid fa-shield-virus text-4xl text-cyber-green mb-6"></i>
+                                <i class="fa-solid fa-shield-virus text-4xl text-primary mb-6"></i>
                                 <h3 class="text-2xl font-bold text-white mb-2">CYBERSEC</h3>
-                                <div class="w-12 h-1 bg-cyber-green mb-6"></div>
+                                <div class="w-12 h-1 bg-primary mb-6"></div>
                                 <p class="text-gray-400 text-sm leading-relaxed mb-6">
                                     Offensive & Defensive Security. CTF Competitions. Cryptography.
                                 </p>
-                                <ul class="text-xs text-cyber-green space-y-2 font-mono">
+                                <ul class="text-xs text-primary space-y-2 font-mono">
                                     <li>> Network Pentesting</li>
                                     <li>> Binary Exploitation</li>
                                     <li>> Forensics</li>
@@ -316,19 +327,19 @@
                     </div>
 
                     <!-- AI Card -->
-                    <div class="tilt-card glass-panel p-1 group cursor-pointer h-96">
-                        <div class="bg-black/40 h-full p-8 flex flex-col relative overflow-hidden border border-transparent group-hover:border-cyber-purple/50 transition-colors">
-                            <div class="absolute -right-10 -top-10 text-9xl text-cyber-purple/5 rotate-12 group-hover:rotate-0 transition-transform duration-700">
+                    <div class="tilt-card glass-panel p-1 group cursor-pointer h-96" onmouseenter="sfx.play('hover')">
+                        <div class="bg-black/40 h-full p-8 flex flex-col relative overflow-hidden border border-transparent group-hover:border-primary transition-colors">
+                            <div class="absolute -right-10 -top-10 text-9xl text-primary opacity-5 rotate-12 group-hover:rotate-0 transition-transform duration-700">
                                 <i class="fa-solid fa-microchip"></i>
                             </div>
                             <div class="tilt-content z-10">
-                                <i class="fa-solid fa-brain text-4xl text-cyber-purple mb-6"></i>
+                                <i class="fa-solid fa-brain text-4xl text-primary mb-6"></i>
                                 <h3 class="text-2xl font-bold text-white mb-2">AI & ML</h3>
-                                <div class="w-12 h-1 bg-cyber-purple mb-6"></div>
+                                <div class="w-12 h-1 bg-primary mb-6"></div>
                                 <p class="text-gray-400 text-sm leading-relaxed mb-6">
                                     Neural Networks. Large Language Models. Computer Vision.
                                 </p>
-                                <ul class="text-xs text-cyber-purple space-y-2 font-mono">
+                                <ul class="text-xs text-primary space-y-2 font-mono">
                                     <li>> Python & PyTorch</li>
                                     <li>> TensorFlow</li>
                                     <li>> HuggingFace</li>
@@ -340,26 +351,25 @@
             </div>
         </section>
 
-        <!-- PAGE: PROJECTS (New) -->
+        <!-- PAGE: PROJECTS -->
         <section id="projects" class="page-section py-20 px-4">
             <div class="max-w-7xl mx-auto">
                 <div class="mb-12">
                     <h2 class="text-4xl font-bold mb-4">OPEN REPOSITORIES</h2>
-                    <div class="flex gap-4 text-sm font-mono overflow-x-auto pb-2">
-                        <button class="text-cyber-green hover:underline">All</button>
-                        <button class="text-gray-500 hover:text-white">Public</button>
-                        <button class="text-gray-500 hover:text-white">Private</button>
-                        <button class="text-gray-500 hover:text-white">Forks</button>
+                    <div class="flex gap-4 text-sm font-mono overflow-x-auto pb-2 border-b border-gray-800">
+                        <button class="text-primary hover:underline px-2 border-b-2 border-primary">All</button>
+                        <button class="text-gray-500 hover:text-white px-2">Public</button>
+                        <button class="text-gray-500 hover:text-white px-2">Private</button>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Project 1 -->
-                    <div class="border border-gray-800 bg-black/50 p-6 rounded-lg hover:border-gray-600 transition-all group">
+                    <div class="border border-gray-800 bg-black/50 p-6 rounded-lg hover:border-primary transition-all group box-glow" onmouseenter="sfx.play('hover')">
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-3">
                                 <i class="fa-solid fa-book-bookmark text-gray-400"></i>
-                                <h3 class="text-cyber-blue font-bold group-hover:underline cursor-pointer">0x-club-bot</h3>
+                                <h3 class="text-primary font-bold group-hover:underline cursor-pointer">0x-club-bot</h3>
                                 <span class="text-xs border border-gray-700 rounded-full px-2 py-0.5 text-gray-400">Public</span>
                             </div>
                             <i class="fa-regular fa-star text-gray-500 hover:text-yellow-400 cursor-pointer"></i>
@@ -367,18 +377,17 @@
                         <p class="text-gray-400 text-sm mb-6">Discord bot for managing club events, CTF scores, and member roles.</p>
                         <div class="flex items-center gap-6 text-xs text-gray-500 font-mono">
                             <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-400"></span> JavaScript</div>
-                            <div class="flex items-center gap-1 hover:text-white cursor-pointer"><i class="fa-regular fa-star"></i> 12</div>
-                            <div class="flex items-center gap-1 hover:text-white cursor-pointer"><i class="fa-solid fa-code-branch"></i> 4</div>
-                            <div>Updated 2 days ago</div>
+                            <div class="flex items-center gap-1"><i class="fa-regular fa-star"></i> 12</div>
+                            <div class="flex items-center gap-1"><i class="fa-solid fa-code-branch"></i> 4</div>
                         </div>
                     </div>
 
                     <!-- Project 2 -->
-                    <div class="border border-gray-800 bg-black/50 p-6 rounded-lg hover:border-gray-600 transition-all group">
+                    <div class="border border-gray-800 bg-black/50 p-6 rounded-lg hover:border-primary transition-all group box-glow" onmouseenter="sfx.play('hover')">
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-3">
                                 <i class="fa-solid fa-book-bookmark text-gray-400"></i>
-                                <h3 class="text-cyber-blue font-bold group-hover:underline cursor-pointer">algo-visualizer</h3>
+                                <h3 class="text-primary font-bold group-hover:underline cursor-pointer">algo-visualizer</h3>
                                 <span class="text-xs border border-gray-700 rounded-full px-2 py-0.5 text-gray-400">Public</span>
                             </div>
                             <i class="fa-regular fa-star text-gray-500 hover:text-yellow-400 cursor-pointer"></i>
@@ -386,65 +395,89 @@
                         <p class="text-gray-400 text-sm mb-6">Interactive 3D visualization of sorting algorithms using Three.js.</p>
                         <div class="flex items-center gap-6 text-xs text-gray-500 font-mono">
                             <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span> TypeScript</div>
-                            <div class="flex items-center gap-1 hover:text-white cursor-pointer"><i class="fa-regular fa-star"></i> 45</div>
-                            <div class="flex items-center gap-1 hover:text-white cursor-pointer"><i class="fa-solid fa-code-branch"></i> 8</div>
-                            <div>Updated 5 days ago</div>
-                        </div>
-                    </div>
-
-                    <!-- Project 3 -->
-                    <div class="border border-gray-800 bg-black/50 p-6 rounded-lg hover:border-gray-600 transition-all group">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-book-bookmark text-gray-400"></i>
-                                <h3 class="text-cyber-blue font-bold group-hover:underline cursor-pointer">ctf-platform-v2</h3>
-                                <span class="text-xs border border-gray-700 rounded-full px-2 py-0.5 text-gray-400">Private</span>
-                            </div>
-                            <i class="fa-regular fa-star text-gray-500 hover:text-yellow-400 cursor-pointer"></i>
-                        </div>
-                        <p class="text-gray-400 text-sm mb-6">Next-gen CTF hosting platform with dynamic docker containers.</p>
-                        <div class="flex items-center gap-6 text-xs text-gray-500 font-mono">
-                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-orange-500"></span> Rust</div>
-                            <div class="flex items-center gap-1 hover:text-white cursor-pointer"><i class="fa-regular fa-star"></i> 8</div>
-                            <div class="flex items-center gap-1 hover:text-white cursor-pointer"><i class="fa-solid fa-code-branch"></i> 2</div>
-                            <div>Updated 1 week ago</div>
+                            <div class="flex items-center gap-1"><i class="fa-regular fa-star"></i> 45</div>
+                            <div class="flex items-center gap-1"><i class="fa-solid fa-code-branch"></i> 8</div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- PAGE: EVENTS (New) -->
+        <!-- PAGE: EVENTS -->
         <section id="events" class="page-section py-20 px-4">
             <div class="max-w-4xl mx-auto">
-                <h2 class="text-4xl font-bold mb-12 border-l-4 border-cyber-red pl-6">TIMELINE_LOGS</h2>
+                <h2 class="text-4xl font-bold mb-12 border-l-4 border-primary pl-6">TIMELINE_LOGS</h2>
                 
                 <div class="relative border-l border-gray-800 ml-3 md:ml-6 space-y-12 pb-12">
                     <!-- Event 1 -->
                     <div class="relative pl-8 md:pl-12 group">
-                        <div class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-cyber-red ring-4 ring-black group-hover:ring-cyber-red/30 transition-all"></div>
-                        <div class="text-xs text-cyber-red font-mono mb-1">UPCOMING // OCT 24, 18:00</div>
-                        <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-cyber-red transition-colors">Rust 101: Memory Safety</h3>
+                        <div class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-black group-hover:ring-primary-dim transition-all"></div>
+                        <div class="text-xs text-primary font-mono mb-1">UPCOMING // OCT 24, 18:00</div>
+                        <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-primary transition-colors">Rust 101: Memory Safety</h3>
                         <p class="text-gray-400 mb-4 text-sm">Introduction to the borrow checker, ownership, and building a simple CLI tool.</p>
-                        <button class="text-xs border border-gray-700 px-3 py-1 hover:bg-white hover:text-black transition-colors">REGISTER_PID</button>
+                        <button class="text-xs border border-gray-700 px-3 py-1 hover:bg-white hover:text-black transition-colors" onmouseenter="sfx.play('hover')">REGISTER_PID</button>
                     </div>
 
                     <!-- Event 2 -->
                     <div class="relative pl-8 md:pl-12 group">
-                        <div class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-gray-600 ring-4 ring-black group-hover:bg-cyber-blue transition-all"></div>
+                        <div class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-gray-600 ring-4 ring-black group-hover:bg-primary transition-all"></div>
                         <div class="text-xs text-gray-500 font-mono mb-1">NOV 01, 20:00</div>
-                        <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-cyber-blue transition-colors">Hack Night v.9</h3>
-                        <p class="text-gray-400 mb-4 text-sm">All night coding session. Pizza and energy drinks provided. Mainframe access granted.</p>
-                        <button class="text-xs border border-gray-700 px-3 py-1 hover:bg-white hover:text-black transition-colors">DETAILS</button>
+                        <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-primary transition-colors">Hack Night v.9</h3>
+                        <p class="text-gray-400 mb-4 text-sm">All night coding session. Pizza and energy drinks provided.</p>
+                        <button class="text-xs border border-gray-700 px-3 py-1 hover:bg-white hover:text-black transition-colors" onmouseenter="sfx.play('hover')">DETAILS</button>
                     </div>
-                    
-                    <!-- Event 3 -->
-                    <div class="relative pl-8 md:pl-12 group opacity-60 hover:opacity-100 transition-opacity">
-                        <div class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-gray-600 ring-4 ring-black"></div>
-                        <div class="text-xs text-gray-500 font-mono mb-1">ARCHIVED // SEP 15</div>
-                        <h3 class="text-2xl font-bold text-white mb-2">Intro to Docker</h3>
-                        <p class="text-gray-400 text-sm">Containerizing your first full-stack application.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE: ADMIN DASHBOARD (Hidden) -->
+        <section id="admin" class="page-section py-8 px-4 hex-bg min-h-screen">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-8 p-4 bg-black/80 border-b border-primary">
+                    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <i class="fa-solid fa-server"></i> SERVER_MAINFRAME // ADMIN_ACCESS
+                    </h2>
+                    <button onclick="router.navigate('home')" class="text-red-500 hover:text-white text-sm">DISCONNECT</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Stat Card 1 -->
+                    <div class="bg-black/90 border border-primary p-4 rounded shadow-[0_0_15px_rgba(0,255,65,0.1)]">
+                        <div class="text-gray-500 text-xs mb-1">TOTAL_TRAFFIC</div>
+                        <div class="text-3xl font-bold text-white" id="stat-traffic">8,942 MB</div>
+                        <div class="w-full bg-gray-900 h-1 mt-2"><div class="bg-primary h-full w-[70%] animate-pulse"></div></div>
                     </div>
+                    <!-- Stat Card 2 -->
+                    <div class="bg-black/90 border border-primary p-4 rounded shadow-[0_0_15px_rgba(0,255,65,0.1)]">
+                        <div class="text-gray-500 text-xs mb-1">ACTIVE_NODES</div>
+                        <div class="text-3xl font-bold text-white">402</div>
+                        <div class="text-xs text-primary mt-1">ALL SYSTEMS OPERATIONAL</div>
+                    </div>
+                    <!-- Stat Card 3 -->
+                    <div class="bg-black/90 border border-primary p-4 rounded shadow-[0_0_15px_rgba(0,255,65,0.1)]">
+                        <div class="text-gray-500 text-xs mb-1">SECURITY_LEVEL</div>
+                        <div class="text-3xl font-bold text-red-500 animate-pulse">DEFCON 3</div>
+                        <div class="text-xs text-gray-400 mt-1">Brute force attempts: 0</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Chart 1 -->
+                    <div class="bg-black/90 border border-gray-800 p-4 rounded">
+                        <h3 class="text-primary text-sm mb-4">CPU_LOAD_HISTORY</h3>
+                        <canvas id="cpuChart" height="200"></canvas>
+                    </div>
+                    <!-- Chart 2 -->
+                    <div class="bg-black/90 border border-gray-800 p-4 rounded">
+                        <h3 class="text-primary text-sm mb-4">NETWORK_TOPOLOGY</h3>
+                        <canvas id="netChart" height="200"></canvas>
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-black/90 border border-gray-800 p-4 font-mono text-xs text-green-400 h-32 overflow-y-auto" id="admin-log">
+                    <div>[10:42:01] System boot sequence initiated...</div>
+                    <div>[10:42:02] Kernel loaded.</div>
+                    <div>[10:42:05] Establishing secure handshake...</div>
                 </div>
             </div>
         </section>
@@ -459,42 +492,151 @@
             
             <!-- Terminal Output Area -->
             <div id="terminal-output" class="flex-grow overflow-y-auto mb-4 text-gray-300 space-y-1">
-                <div class="text-cyber-green">Welcome to 0xClub Shell v2.0.4</div>
+                <div class="text-primary">Welcome to 0xClub Shell v3.1.0</div>
                 <div>Type 'help' for available commands.</div>
                 <br>
             </div>
 
             <!-- Input Line -->
             <div class="flex items-center text-white">
-                <span class="text-cyber-green mr-2">guest@0xClub:~$</span>
-                <input type="text" id="terminal-input" class="bg-transparent border-none outline-none flex-grow text-white font-mono caret-cyber-green" autocomplete="off" autofocus>
+                <span class="text-primary mr-2">guest@0xClub:~$</span>
+                <input type="text" id="terminal-input" class="bg-transparent border-none outline-none flex-grow text-white font-mono caret-primary" autocomplete="off" autofocus>
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER (Persistent) -->
+    <!-- FOOTER -->
     <footer class="border-t border-white/5 bg-black py-6 mt-auto relative z-10">
         <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 font-mono">
-            <div>
-                NO COOKIES. NO TRACKERS. JUST CODE.
-            </div>
-            <div class="mt-2 md:mt-0">
-                <span class="hover:text-cyber-green cursor-pointer">GITHUB</span> // 
-                <span class="hover:text-cyber-blue cursor-pointer">DISCORD</span> // 
-                <span class="hover:text-cyber-purple cursor-pointer">INSTAGRAM</span>
+            <div>NO COOKIES. NO TRACKERS. JUST CODE.</div>
+            <div class="mt-2 md:mt-0 flex gap-4">
+                <a href="#" class="hover:text-primary">GITHUB</a>
+                <a href="#" class="hover:text-primary">DISCORD</a>
             </div>
         </div>
     </footer>
 
     <!-- LOGIC CORE -->
     <script>
-        // --- 1. SPA ROUTER SYSTEM ---
+        // --- 1. AUDIO SYNTHESIZER (Advanced) ---
+        // Generates sci-fi sounds using Web Audio API so no assets are needed.
+        const sfx = {
+            ctx: null,
+            muted: true,
+            init: function() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    this.muted = false;
+                    this.updateIcon();
+                }
+            },
+            toggle: function() {
+                if(!this.ctx) this.init();
+                this.muted = !this.muted;
+                this.updateIcon();
+            },
+            updateIcon: function() {
+                const icon = document.getElementById('mute-icon');
+                if (this.muted) {
+                    icon.classList.remove('fa-volume-high');
+                    icon.classList.add('fa-volume-xmark');
+                } else {
+                    icon.classList.remove('fa-volume-xmark');
+                    icon.classList.add('fa-volume-high');
+                }
+            },
+            play: function(type) {
+                if (this.muted || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                const now = this.ctx.currentTime;
+                
+                if (type === 'hover') {
+                    // High pitched short blip
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'click') {
+                    // Thud click
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'access') {
+                    // Success chime
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(554, now + 0.1);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'denied') {
+                    // Error buzz
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                }
+            }
+        };
+
+        // --- 2. THEME ENGINE ---
+        const themes = {
+            current: 'green',
+            set: function(theme) {
+                const root = document.documentElement;
+                this.current = theme;
+                let color, dim, glow;
+
+                switch(theme) {
+                    case 'blue':
+                        color = '#00f3ff'; dim = 'rgba(0, 243, 255, 0.1)'; glow = 'rgba(0, 243, 255, 0.5)';
+                        break;
+                    case 'red':
+                        color = '#ff003c'; dim = 'rgba(255, 0, 60, 0.1)'; glow = 'rgba(255, 0, 60, 0.5)';
+                        break;
+                    case 'purple':
+                        color = '#bd00ff'; dim = 'rgba(189, 0, 255, 0.1)'; glow = 'rgba(189, 0, 255, 0.5)';
+                        break;
+                    default: // green
+                        color = '#00ff41'; dim = 'rgba(0, 255, 65, 0.1)'; glow = 'rgba(0, 255, 65, 0.5)';
+                }
+
+                root.style.setProperty('--primary', color);
+                root.style.setProperty('--primary-dim', dim);
+                root.style.setProperty('--primary-glow', glow);
+                
+                // Update charts if they exist
+                if (window.cpuChartInstance) {
+                    window.cpuChartInstance.data.datasets[0].borderColor = color;
+                    window.cpuChartInstance.data.datasets[0].backgroundColor = dim;
+                    window.cpuChartInstance.update();
+                }
+                
+                sfx.play('click');
+                document.getElementById('theme-selector').classList.add('hidden');
+            }
+        };
+
+        // --- 3. SPA ROUTER & KONAMI CODE ---
         const router = {
             currentPage: 'home',
-            
             navigate: function(pageId) {
-                // Handle terminal special case (overlay)
                 if (pageId === 'terminal') {
                     document.getElementById('terminal').classList.remove('hidden');
                     document.getElementById('terminal').classList.add('active');
@@ -502,89 +644,113 @@
                     return;
                 }
                 
-                // Hide terminal if open
                 document.getElementById('terminal').classList.add('hidden');
                 document.getElementById('terminal').classList.remove('active');
 
-                // Standard Navigation
                 document.querySelectorAll('.page-section').forEach(section => {
                     section.classList.remove('active');
-                    setTimeout(() => {
-                        if(!section.classList.contains('active')) section.style.display = 'none';
-                    }, 400); // Wait for fade out
+                    setTimeout(() => { if(!section.classList.contains('active')) section.style.display = 'none'; }, 400);
                 });
 
                 const target = document.getElementById(pageId);
                 if (target) {
                     target.style.display = 'block';
-                    // Small delay to allow display:block to apply before opacity transition
-                    requestAnimationFrame(() => {
-                        target.classList.add('active');
-                    });
-                    
+                    requestAnimationFrame(() => target.classList.add('active'));
                     this.currentPage = pageId;
                     
-                    // Update Nav State
+                    // Nav Highlights
                     document.querySelectorAll('.nav-btn').forEach(btn => {
                         if(btn.dataset.target === pageId) {
-                            btn.classList.add('text-white', 'bg-white/10');
+                            btn.classList.add('text-primary', 'bg-primary-dim');
                             btn.classList.remove('text-gray-400');
                         } else {
-                            btn.classList.remove('text-white', 'bg-white/10');
+                            btn.classList.remove('text-primary', 'bg-primary-dim');
                             btn.classList.add('text-gray-400');
                         }
                     });
                     
-                    // Scroll to top
                     window.scrollTo(0,0);
+                    
+                    // Init Admin charts if accessing admin
+                    if (pageId === 'admin') initAdminDashboard();
                 }
             }
         };
 
-        // --- 2. TERMINAL EMULATOR ---
+        // Konami Code Logic
+        let kKeys = [];
+        const konami = "ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a";
+        window.addEventListener('keydown', (e) => {
+            kKeys.push(e.key);
+            if (kKeys.toString().indexOf(konami) >= 0) {
+                kKeys = [];
+                sfx.play('access');
+                alert("GOD MODE ENABLED: THEME UNLOCKED");
+                themes.set('red');
+                router.navigate('admin');
+            }
+            if (kKeys.length > 20) kKeys.shift(); // keep buffer small
+        });
+
+        // --- 4. TERMINAL & ADMIN SYSTEM ---
         const termInput = document.getElementById('terminal-input');
         const termOutput = document.getElementById('terminal-output');
         
         const commands = {
-            'help': 'Available commands: help, ls, cd [page], clear, whoami, date, matrix',
-            'ls': 'home  tracks  projects  events  contact.txt  secret_key.pem',
+            'help': 'Commands: help, ls, cd [dir], clear, whoami, theme [color], sfx [on/off], admin',
+            'ls': 'home  tracks  projects  events  restricted_access/',
             'whoami': 'guest_user_402',
-            'date': new Date().toString(),
-            'clear': 'CLEAR', // Special handler
+            'clear': 'CLEAR',
             'cd home': () => router.navigate('home'),
             'cd tracks': () => router.navigate('tracks'),
             'cd projects': () => router.navigate('projects'),
             'cd events': () => router.navigate('events'),
-            'cat contact.txt': 'email: root@0xclub.edu',
-            'matrix': 'Wake up, Neo...',
-            'sudo': 'User not in the sudoers file. This incident will be reported.'
+            'sfx on': () => { if(sfx.muted) sfx.toggle(); return "SFX Systems Online"; },
+            'sfx off': () => { if(!sfx.muted) sfx.toggle(); return "SFX Systems Offline"; },
+            'theme green': () => { themes.set('green'); return "Applied Theme: Matrix"; },
+            'theme blue': () => { themes.set('blue'); return "Applied Theme: Ice"; },
+            'theme red': () => { themes.set('red'); return "Applied Theme: Alert"; },
+            'theme purple': () => { themes.set('purple'); return "Applied Theme: Synth"; },
+            'admin': () => {
+                const pass = prompt("ENTER ADMIN PASSWORD:");
+                if (pass === "password" || pass === "123456" || pass === "admin") {
+                    // Joke password check
+                    sfx.play('denied');
+                    return "ERROR: WEAK PASSWORD. ACCESS DENIED.";
+                } else if (pass === "0xClub" || pass === "root") {
+                    sfx.play('access');
+                    router.navigate('admin');
+                    return "ACCESS GRANTED. LOADING DASHBOARD...";
+                } else {
+                    sfx.play('denied');
+                    return "ACCESS DENIED.";
+                }
+            }
         };
 
         termInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
-                const input = this.value.trim().toLowerCase();
+                const input = this.value.trim();
                 if (!input) return;
+                sfx.play('click');
+                writeToTerm(`guest@0xClub:~$ ${input}`, 'text-gray-400');
 
-                // Echo command
-                writeToTerm(`guest@0xClub:~$ ${this.value}`, 'text-gray-400');
+                let cmd = input.toLowerCase();
+                let response = commands[cmd];
 
-                // Process command
-                let response = commands[input];
-                
-                // Handle "cd" partials
-                if (!response && input.startsWith('cd ')) {
-                    const dest = input.split(' ')[1];
-                    if (['home','tracks','projects','events'].includes(dest)) {
-                        response = () => router.navigate(dest);
-                    } else {
-                        response = `Directory not found: ${dest}`;
-                    }
+                // Partial matches
+                if (!response && cmd.startsWith('cd ')) {
+                    const dest = cmd.split(' ')[1];
+                    if (['home','tracks','projects','events'].includes(dest)) response = () => router.navigate(dest);
+                    else response = `Directory not found: ${dest}`;
+                } else if (!response && cmd.startsWith('theme ')) {
+                    response = "Usage: theme [green|blue|red|purple]";
                 }
 
                 if (response) {
                     if (typeof response === 'function') {
-                        response();
-                        writeToTerm('Navigating...', 'text-cyber-green');
+                        const output = response();
+                        if (output) writeToTerm(output, 'text-white');
                     } else if (response === 'CLEAR') {
                         termOutput.innerHTML = '';
                     } else {
@@ -593,9 +759,7 @@
                 } else {
                     writeToTerm(`Command not found: ${input}`, 'text-red-500');
                 }
-
                 this.value = '';
-                // Scroll to bottom
                 termOutput.scrollTop = termOutput.scrollHeight;
             }
         });
@@ -607,46 +771,150 @@
             termOutput.appendChild(div);
         }
 
-        // --- 3. 3D TILT EFFECT ---
-        document.addEventListener('mousemove', (e) => {
-            document.querySelectorAll('.tilt-card').forEach(card => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                // Only animate if mouse is near/over the card to save performance
-                if (x > -50 && x < rect.width + 50 && y > -50 && y < rect.height + 50) {
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    
-                    const rotateX = ((y - centerY) / centerY) * -10; // Max 10deg
-                    const rotateY = ((x - centerX) / centerX) * 10;
-                    
-                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-                } else {
-                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+        // --- 5. ADMIN DASHBOARD CHARTS ---
+        window.cpuChartInstance = null;
+        function initAdminDashboard() {
+            if (window.cpuChartInstance) return; // Already init
+
+            const ctx1 = document.getElementById('cpuChart').getContext('2d');
+            const ctx2 = document.getElementById('netChart').getContext('2d');
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+            const primaryDim = getComputedStyle(document.documentElement).getPropertyValue('--primary-dim').trim();
+
+            // CPU Chart
+            window.cpuChartInstance = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: Array(20).fill(''),
+                    datasets: [{
+                        label: 'Core Load %',
+                        data: Array(20).fill(0).map(() => Math.random() * 50 + 20),
+                        borderColor: primaryColor,
+                        backgroundColor: primaryDim,
+                        borderWidth: 1,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    animation: false,
+                    scales: {
+                        x: { display: false },
+                        y: { beginAtZero: true, max: 100, grid: { color: '#222' } }
+                    },
+                    plugins: { legend: { display: false } }
                 }
             });
-        });
 
-        // --- 4. SYSTEM BOOT ---
+            // Network Chart (Radar)
+            new Chart(ctx2, {
+                type: 'radar',
+                data: {
+                    labels: ['HTTP', 'SSH', 'FTP', 'SMTP', 'WS'],
+                    datasets: [{
+                        label: 'Traffic Vol',
+                        data: [80, 40, 20, 10, 90],
+                        borderColor: '#fff',
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { r: { grid: { color: '#333' }, angleLines: { color: '#333' } } }
+                }
+            });
+
+            // Live Update Loop
+            setInterval(() => {
+                if(router.currentPage !== 'admin') return;
+                const chart = window.cpuChartInstance;
+                const data = chart.data.datasets[0].data;
+                data.shift();
+                data.push(Math.random() * 40 + 30);
+                chart.update();
+
+                // Update text stats
+                document.getElementById('stat-traffic').innerText = Math.floor(Math.random() * 500 + 8500) + " MB";
+                
+                // Add Logs
+                const log = document.getElementById('admin-log');
+                const p = document.createElement('div');
+                p.innerText = `[${new Date().toLocaleTimeString()}] Packet received from 192.168.1.${Math.floor(Math.random()*255)}`;
+                log.prepend(p);
+                if (log.children.length > 20) log.lastChild.remove();
+
+            }, 1000);
+        }
+
+        // --- 6. ADVANCED MATRIX (Mouse Interactive) ---
+        function startMatrix() {
+            const canvas = document.getElementById('matrix-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const chars = '01XYZ@#&';
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
+            
+            // Mouse Interaction
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            function draw() {
+                ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+                ctx.fillStyle = primaryColor;
+                ctx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                    const x = i * fontSize;
+                    const y = drops[i] * fontSize;
+                    
+                    // Mouse repulsion logic
+                    const dist = Math.hypot(x - mouseX, y - mouseY);
+                    if (dist < 100) {
+                        ctx.fillStyle = '#fff'; // Highlight near mouse
+                    } else {
+                        ctx.fillStyle = primaryColor;
+                    }
+
+                    ctx.fillText(text, x, y);
+
+                    if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+            window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+        }
+
+        // --- 7. INIT SEQUENCE ---
         window.addEventListener('load', () => {
-            // Initial nav state
-            router.navigate('home');
-
             // Boot animation
             const progress = document.getElementById('progress-bar');
             const loaderText = document.getElementById('loader-text');
             const loader = document.getElementById('loader');
 
-            setTimeout(() => { progress.style.width = '40%'; }, 200);
+            setTimeout(() => { progress.style.width = '40%'; sfx.play('click'); }, 200);
             setTimeout(() => { 
                 progress.style.width = '80%'; 
-                loaderText.innerText = "> LOADING ASSETS...";
+                loaderText.innerText = "> DECRYPTING...";
             }, 800);
             setTimeout(() => { 
                 progress.style.width = '100%'; 
-                loaderText.innerText = "> DECRYPTING...";
+                loaderText.innerText = "> ACCESS GRANTED";
+                sfx.play('access');
             }, 1400);
 
             setTimeout(() => {
@@ -654,83 +922,34 @@
                 loader.style.pointerEvents = 'none';
                 startMatrix();
                 typeWriter();
+                // Prompt user to enable sound (since browser blocks autoplay)
+                console.log("System Ready. Click Mute Icon to enable Audio.");
             }, 1800);
         });
 
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                menu.classList.add('flex');
-            } else {
-                menu.classList.add('hidden');
-                menu.classList.remove('flex');
-            }
-        }
-
-        // --- 5. MATRIX & TYPING (Optimized) ---
-        function startMatrix() {
-            const canvas = document.getElementById('matrix-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            const chars = '01XYZ';
-            const fontSize = 14;
-            const columns = canvas.width / fontSize;
-            const drops = Array(Math.floor(columns)).fill(1);
-
-            function draw() {
-                ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#00ff41';
-                ctx.font = fontSize + 'px monospace';
-
-                for (let i = 0; i < drops.length; i++) {
-                    const text = chars.charAt(Math.floor(Math.random() * chars.length));
-                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                    drops[i]++;
-                }
-                requestAnimationFrame(draw);
-            }
-            draw();
-            
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-        }
-
-        const typeTexts = ["init_learning_sequence...", "accessing_neural_net...", "deploying_smart_contracts...", "hacking_reality..."];
-        let txtIdx = 0;
-        let charIdx = 0;
-        let isDeleting = false;
-        
+        // Typing Effect
+        const typeTexts = ["init_learning_sequence...", "deploying_smart_contracts...", "hacking_reality..."];
+        let txtIdx = 0, charIdx = 0, isDeleting = false;
         function typeWriter() {
-            const current = typeTexts[txtIdx];
             const el = document.getElementById('typing-hero');
-            
-            if (!el) return; // Guard clause if element missing
-
-            if (isDeleting) {
-                el.innerText = current.substring(0, charIdx - 1);
-                charIdx--;
-            } else {
-                el.innerText = current.substring(0, charIdx + 1);
-                charIdx++;
-            }
+            if(!el) return;
+            const current = typeTexts[txtIdx];
+            el.innerText = current.substring(0, isDeleting ? charIdx - 1 : charIdx + 1);
+            charIdx += isDeleting ? -1 : 1;
 
             let speed = isDeleting ? 50 : 100;
-
-            if (!isDeleting && charIdx === current.length) {
-                speed = 2000;
-                isDeleting = true;
-            } else if (isDeleting && charIdx === 0) {
-                isDeleting = false;
-                txtIdx = (txtIdx + 1) % typeTexts.length;
-            }
+            if (!isDeleting && charIdx === current.length) { speed = 2000; isDeleting = true; }
+            else if (isDeleting && charIdx === 0) { isDeleting = false; txtIdx = (txtIdx + 1) % typeTexts.length; }
+            
             setTimeout(typeWriter, speed);
+        }
+        
+        // Mobile Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+            sfx.play('click');
         }
     </script>
 </body>
